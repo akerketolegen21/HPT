@@ -1,0 +1,27 @@
+dataset:
+  name: pngptc
+  task: multi-label
+  max_length: 512
+  level: 3
+  num_labels: 30
+  label_names: []
+  test_mode: False
+  
+model:
+  name: bert
+  backbone: bert-base-uncased
+  prompt_length: 5
+  prompt_mid_dim: 512
+  hyper_dims: [768, 512]
+  
+train:
+  batch_size: 8
+  optimizer: AdamW
+  learning_rate: 3e-5
+  weight_decay: 0.01
+  gradient_accumulation_steps: 1
+  max_epochs: 20
+  lr_scheduler: linear
+  warmup_ratio: 0.1
+  eval_patience: 5
+  eval_every: 100
