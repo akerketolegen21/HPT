@@ -2,3 +2,7 @@ checkpoints/
 .idea/
 data
 datas
+*.pyc
+*.txt
+*.out
+*.err

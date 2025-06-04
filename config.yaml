@@ -1,5 +1,5 @@
 dataset:
-  name: pngptc
+  name: memes2021
   task: multi-label
   max_length: 512
   level: 3

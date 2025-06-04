@@ -9,13 +9,13 @@ import json
 from tqdm import tqdm
 def parse():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--checkpoint_path', type=str, default="checkpoints/memes-subtask1-hpt/checkpoint_last.pt")
-    parser.add_argument('--test_data', type=str, default='data/proc_datas/en_subtask1_test_unlabeled.json')
-    parser.add_argument('--data', type=str, default='data/proc_datas/')
+    parser.add_argument('--checkpoint_path', type=str, default="checkpoints/memes-subtask1-hpt-pngptc/checkpoint_last.pt")
+    parser.add_argument('--test_data', type=str, default='data/subtask1/proc_datas/en_subtask1_test_unlabeled.json')
+    parser.add_argument('--data', type=str, default='data/subtask1/proc_datas/')
     parser.add_argument('--layer', type=int, default=1)
     parser.add_argument('--graph', type=str, default='GAT')
     parser.add_argument('--arch', type=str, default='bert-base-uncased')
-    parser.add_argument('--batch_size', type=int, default=16)
+    parser.add_argument('--batch_size', type=int, default=8)
     parser.add_argument('--model', type=str, default='prompt')
     parser.add_argument('--output_dir', type=str, default='predictions/subtask1/')
     return parser
@@ -88,7 +88,7 @@ def load_model_and_predict(device='cuda' if torch.cuda.is_available() else 'cpu'
     
     if args.model == 'prompt':
         dataset = datasets.load_dataset('json',
-                                            data_files={'test': 'data/proc_datas/en_subtask1_test_unlabeled.json'.format(args.data, args.data), 
+                                            data_files={'test': 'data/subtask2a/en_subtask2a_test_unlabeled.json'.format(args.data, args.data), 
                                                         })
 
         prefix = []
@@ -133,7 +133,7 @@ def load_model_and_predict(device='cuda' if torch.cuda.is_available() else 'cpu'
                 
     #format predictions
     orig_dataset = datasets.load_dataset('json',
-                                            data_files={'test': 'data/proc_datas/en_subtask1_test_unlabeled.json'
+                                            data_files={'test': 'data/subtask2a/en_subtask2a_test_unlabeled.json'
                                                         })
     ids = [item['id'] for item in orig_dataset['test']]
     formatted_predictions = format_predictions(predictions, ids, label_list)

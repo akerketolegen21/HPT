@@ -112,7 +112,7 @@ if __name__ == '__main__':
 
     tokenizer = AutoTokenizer.from_pretrained(args.arch)
     data_path = args.data
-    args.name = "memes-subtask1" + '-' + args.name
+    args.name = "old_data" + '-' + args.name
     batch_size = args.batch
 
     label_dict = torch.load(os.path.join(data_path, 'value_dict.pt'))
@@ -200,7 +200,7 @@ if __name__ == '__main__':
         train_dataset = dataset["train"].train_test_split(test_size=0.2)
         dataset['train'] = train_dataset['train']
         dataset['test'] = train_dataset['test']
-        # dataset['test'].set_format('torch', columns=['attention_mask', 'input_ids', 'labels'])
+        dataset['test'].set_format('torch', columns=['attention_mask', 'input_ids', 'labels'])
 
         from models.prompt import Prompt
 
@@ -237,7 +237,7 @@ if __name__ == '__main__':
         os.mkdir(os.path.join('checkpoints', args.name))
     # Load checkpoint if resuming training
     if args.resume:
-        checkpoint_path = os.path.join('checkpoints', args.name, args.checkpoint)
+        checkpoint_path = os.path.join('checkpoints', "old_data-train_old_data", args.checkpoint)
         if os.path.exists(checkpoint_path):
             print(f"Loading checkpoint from {checkpoint_path}")
             checkpoint = torch.load(checkpoint_path)
@@ -245,7 +245,7 @@ if __name__ == '__main__':
             optimizer.load_state_dict(checkpoint['optim'])
             best_score_macro = checkpoint.get('best_score', 0)
             best_score_micro = checkpoint.get('score', 0)
-            early_stop_count = checkpoint.get('early_stop_count', 0)
+            # early_stop_count = checkpoint.get('early_stop_count', 0)
             print(f"Resuming from: Best macro score: {best_score_macro}, Best micro score: {best_score_micro}")
         else:
             print(f"No checkpoint found at {checkpoint_path}, starting from scratch")
@@ -253,6 +253,9 @@ if __name__ == '__main__':
     save = Save(model, optimizer, None, args)
     
     for epoch in range(1000):
+        print('epoch: ', epoch)
+        # print('early stop count: ', early_stop_count)
+        # print('args.early_stop: ', args.early_stop)
         if early_stop_count >= args.early_stop:
             print("Early stop!")
             break

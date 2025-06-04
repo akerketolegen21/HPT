@@ -129,6 +129,7 @@ def main():
     parser = argparse.ArgumentParser(description="Convert data to HPT format")
     parser.add_argument("--train", required=True, help="Path to train.json")
     parser.add_argument("--val", required=True, help="Path to val.json")
+    parser.add_argument("--test", required=True, help="Path to test.json")
     parser.add_argument("--output_dir", default="data/your_dataset", help="Output directory")
     parser.add_argument("--dataset_name", default="your_dataset", help="Dataset name")
     args = parser.parse_args()
@@ -147,7 +148,13 @@ def main():
         os.path.join(args.output_dir, "dev.json"),  # HPT uses "dev" instead of "val"
         label_to_id
     )
+    print("Processing test data...")
     
+    convert_data_format(
+        args.test, 
+        os.path.join(args.output_dir, "test.json"),
+        label_to_id
+    )
     # Process hierarchy tree
     print("Processing hierarchy tree...")
     hierarchy_dict = process_hierarchy_tree(
