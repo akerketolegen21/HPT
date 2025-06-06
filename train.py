@@ -112,7 +112,7 @@ if __name__ == '__main__':
 
     tokenizer = AutoTokenizer.from_pretrained(args.arch)
     data_path = args.data
-    args.name = "old_data" + '-' + args.name
+    args.name = "new_hier" + '-' + args.name
     batch_size = args.batch
 
     label_dict = torch.load(os.path.join(data_path, 'value_dict.pt'))
@@ -237,7 +237,7 @@ if __name__ == '__main__':
         os.mkdir(os.path.join('checkpoints', args.name))
     # Load checkpoint if resuming training
     if args.resume:
-        checkpoint_path = os.path.join('checkpoints', "old_data-train_old_data", args.checkpoint)
+        checkpoint_path = os.path.join('checkpoints', args.checkpoint)
         if os.path.exists(checkpoint_path):
             print(f"Loading checkpoint from {checkpoint_path}")
             checkpoint = torch.load(checkpoint_path)

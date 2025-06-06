@@ -10,14 +10,14 @@ from tqdm import tqdm
 def parse():
     parser = argparse.ArgumentParser()
     parser.add_argument('--checkpoint_path', type=str, default="checkpoints/memes-subtask1-hpt-pngptc/checkpoint_last.pt")
-    parser.add_argument('--test_data', type=str, default='data/subtask1/proc_datas/en_subtask1_test_unlabeled.json')
+    parser.add_argument('--test_data', type=str, default='data/subtask2a/proc_datas/en_subtask2a_test_unlabeled.json')
     parser.add_argument('--data', type=str, default='data/subtask1/proc_datas/')
     parser.add_argument('--layer', type=int, default=1)
     parser.add_argument('--graph', type=str, default='GAT')
     parser.add_argument('--arch', type=str, default='bert-base-uncased')
     parser.add_argument('--batch_size', type=int, default=8)
     parser.add_argument('--model', type=str, default='prompt')
-    parser.add_argument('--output_dir', type=str, default='predictions/subtask1/')
+    parser.add_argument('--output_dir', type=str, default='predictions/subtask2/')
     return parser
 
 def format_predictions(predictions, ids, label_list):
@@ -26,7 +26,17 @@ def format_predictions(predictions, ids, label_list):
     print(label_list)
     for i, pred in enumerate(predictions):
         print(pred)
-        labels = [label_list[idx] for idx in pred]
+        labels = []
+        for idx in pred:
+            label = label_list[idx]
+            if "Logos_" in label or "Ethos_" in label:
+                label = label[6:]
+            if "Pathos_" in label:
+                label = label[7:]
+            if label == "AdHominem_Whataboutism" or label == "Distraction_Whataboutism":
+                label = "Whataboutism"
+            label = label.replace("_", " ")
+            labels.append(label)
         results.append({
             "id": ids[i],
             "labels": labels
@@ -52,13 +62,14 @@ def load_model_and_predict(device='cuda' if torch.cuda.is_available() else 'cpu'
             value2slot[v] = s
             if num_class < v:
                 num_class = v
+        if num_class < s:
+            num_class = s
     num_class += 1
 
     path_list = [(i, v) for v, i in value2slot.items()]
     for i in range(num_class):
         if i not in value2slot:
             value2slot[i] = -1
-
     def get_depth(x):
         depth = 0
         while value2slot[x] != -1:
@@ -70,12 +81,10 @@ def load_model_and_predict(device='cuda' if torch.cuda.is_available() else 'cpu'
     depth_dict = {i: get_depth(i) for i in range(num_class)}
     max_depth = depth_dict[max(depth_dict, key=depth_dict.get)] + 1
     depth2label = {i: [a for a in depth_dict if depth_dict[a] == i] for i in range(max_depth)}
-    print(depth2label)
     
     for depth in depth2label:
         for l in depth2label[depth]:
             path_list.append((num_class + depth, l))
-
 
     model = Prompt.from_pretrained(args.arch, num_labels=len(label_dict), path_list=path_list, layer=args.layer,
                                    graph_type=args.graph, data_path=data_path, depth2label=depth2label,)
